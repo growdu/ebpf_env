@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "table",
+      "title": "Top-N exec by count",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (pid, comm) (ebpf_exec_total))",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Total execs (sum)",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(ebpf_exec_total)",
+          "format": "time_series"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1,
+  "title": "eBPF Exporter Dashboard"
+}

@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  ebpf-dev:
+    build: .
+    container_name: ebpf-dev
+    tty: true
+    stdin_open: true
+    cap_add:
+      - BPF
+      - PERFMON
+      - NET_ADMIN
+      - SYS_RESOURCE
+      - IPC_LOCK
+    security_opt:
+      - seccomp=unconfined
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - /usr/src:/usr/src:ro
+      - ./workdir:/home/dev/workdir
+      - /sys/fs/bpf:/sys/fs/bpf
+      - /sys/kernel/debug:/sys/kernel/debug
+    networks:
+      - ebpf-net
+
+  prometheus:
+    image: prom/prometheus:2.47.0
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - ebpf-net
+
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboard.json:/var/lib/grafana/dashboards/ebpf-dashboard.json:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    networks:
+      - ebpf-net
+
+volumes:
+  grafana_data:
+
+networks:
+  ebpf-net:
+    driver: bridge

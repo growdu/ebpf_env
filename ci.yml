@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (for docker buildx)
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t ebpf-dev:ci .
+
+      - name: Test eBPF compile
+        run: |
+          docker run --rm ebpf-dev:ci bash -c "clang -O2 -g -target bpf -c workdir/bpf/execsnoop_pid.bpf.c -o /tmp/test.o && echo OK"
+
+      - name: Test Go build
+        run: |
+          docker run --rm ebpf-dev:ci bash -c "cd workdir/loader/cmd/ebpf_exporter && go build -v ./... && echo OK"
