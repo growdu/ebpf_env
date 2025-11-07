@@ -1,5 +1,12 @@
 FROM centos:8
 
+# Fix CentOS 8 repo (official mirrors are offline)
+RUN sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+        -e 's|^#baseurl=http://mirror.centos.org|baseurl=http://mirrors.aliyun.com|g' \
+        -i /etc/yum.repos.d/CentOS-*.repo && \
+    dnf clean all && dnf makecache
+
+
 ENV LANG=C.UTF-8
 ENV GO_VERSION=1.21.7
 ENV PATH=/usr/local/go/bin:$PATH
