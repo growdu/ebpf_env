@@ -29,13 +29,16 @@ RUN mkdir -p /opt && cd /opt && \
     git clone --depth 1 https://github.com/libbpf/libbpf.git && \
     cd libbpf/src && make install PREFIX=/usr && rm -rf /opt/libbpf
 
-# Install bpftool from Linux kernel tools
+# Use existing libbpf from /opt/libbpf
 RUN if ! command -v bpftool >/dev/null 2>&1 ; then \
       mkdir -p /tmp/build && cd /tmp/build && \
       git clone --depth 1 https://github.com/libbpf/bpftool.git && \
-      cd bpftool/src && make install PREFIX=/usr && \
+      cd bpftool/src && \
+      make BUILD_STATIC_ONLY=0 LIBBPF_DIR=/opt/libbpf && \
+      make install PREFIX=/usr && \
       cd / && rm -rf /tmp/build ; \
     fi
+
 
 # Install Go
 RUN curl -fsSL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz -o /tmp/go.tar.gz &&     tar -C /usr/local -xzf /tmp/go.tar.gz && rm -f /tmp/go.tar.gz
