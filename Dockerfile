@@ -11,7 +11,23 @@ ENV LANG=C.UTF-8
 ENV GO_VERSION=1.21.7
 ENV PATH=/usr/local/go/bin:$PATH
 
-RUN dnf -y update &&     dnf -y install epel-release &&     dnf -y groupinstall "Development Tools" &&     dnf -y install       cmake make wget git unzip tar vim which       python3 python3-pip       clang llvm llvm-devel clang-devel       elfutils-libelf-devel libbpf-devel libbpf       kernel-headers kernel-devel       cmake3 pkgconfig       iproute iproute-doc       sudo curl jq openssh-server which &&     dnf clean all
+# 安装基础开发环境
+RUN dnf -y update && \
+    dnf -y install epel-release && \
+    dnf -y groupinstall "Development Tools" && \
+    dnf -y install \
+      cmake make wget git unzip tar vim which \
+      python3 python3-pip \
+      clang llvm llvm-devel clang-devel \
+      elfutils-libelf-devel kernel-headers kernel-devel \
+      cmake3 pkgconfig \
+      iproute sudo curl jq openssh-server which && \
+    dnf clean all
+
+# 手动编译并安装 libbpf（因为官方源没提供 libbpf-devel）
+RUN mkdir -p /opt && cd /opt && \
+    git clone --depth 1 https://github.com/libbpf/libbpf.git && \
+    cd libbpf/src && make install PREFIX=/usr && rm -rf /opt/libbpf
 
 # Install bpftool from kernel tools if not present
 RUN if ! command -v bpftool >/dev/null 2>&1 ; then       mkdir -p /tmp/build && cd /tmp/build &&       git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bpf.git bpf-tools || true &&       cd bpf-tools/tools/bpftool && make && cp bpftool /usr/local/bin/ && cd / && rm -rf /tmp/build ;     fi
