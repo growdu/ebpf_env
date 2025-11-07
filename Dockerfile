@@ -29,11 +29,13 @@ RUN mkdir -p /opt && cd /opt && \
     git clone --depth 1 https://github.com/libbpf/libbpf.git && \
     cd libbpf/src && make install PREFIX=/usr && rm -rf /opt/libbpf
 
-# Install bpftool from kernel tools if not present
-RUN if ! command -v bpftool >/dev/null 2>&1 ; then       mkdir -p /tmp/build && cd /tmp/build &&       git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bpf.git bpf-tools || true &&       cd bpf-tools/tools/bpftool && make && cp bpftool /usr/local/bin/ && cd / && rm -rf /tmp/build ;     fi
-
-# Install libbpf if system package missing
-RUN if [ ! -f /usr/lib64/libbpf.a ] ; then       mkdir -p /opt/libbpf && cd /opt &&       git clone --depth 1 https://github.com/libbpf/libbpf.git &&       cd libbpf/src && make && make install || true ;     fi
+# Install bpftool from Linux kernel tools
+RUN if ! command -v bpftool >/dev/null 2>&1 ; then \
+      mkdir -p /tmp/build && cd /tmp/build && \
+      git clone --depth 1 https://github.com/libbpf/bpftool.git && \
+      cd bpftool/src && make install PREFIX=/usr && \
+      cd / && rm -rf /tmp/build ; \
+    fi
 
 # Install Go
 RUN curl -fsSL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz -o /tmp/go.tar.gz &&     tar -C /usr/local -xzf /tmp/go.tar.gz && rm -f /tmp/go.tar.gz
