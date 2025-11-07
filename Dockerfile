@@ -21,6 +21,7 @@ RUN dnf -y update && \
       clang llvm llvm-devel clang-devel \
       elfutils-libelf-devel kernel-headers kernel-devel \
       cmake3 pkgconfig \
+      openssl openssl-devel \
       iproute sudo curl jq openssh-server which && \
     dnf clean all
 
