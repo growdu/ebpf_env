@@ -33,8 +33,8 @@ RUN mkdir -p /opt && cd /opt && \
 # Install bpftool (with submodules)
 RUN if ! command -v bpftool >/dev/null 2>&1 ; then \
       mkdir -p /tmp/build && cd /tmp/build && \
-      git clone --branch V6.6.0 --recurse-submodules https://github.com/libbpf/bpftool.git && \
-      cd bpftool/src && make && make install PREFIX=/usr && \
+      git clone --recurse-submodules https://github.com/libbpf/bpftool.git && \
+      cd bpftool/src && make NO_OPENSSL=1 && make install PREFIX=/usr && \
       cd / && rm -rf /tmp/build ; \
     fi
 
