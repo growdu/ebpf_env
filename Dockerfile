@@ -29,6 +29,15 @@ RUN mkdir -p /opt && cd /opt && \
     git clone --depth 1 https://github.com/libbpf/libbpf.git && \
     cd libbpf/src && make install PREFIX=/usr && rm -rf /opt/libbpf
 
+# Install bpftool (with submodules)
+RUN if ! command -v bpftool >/dev/null 2>&1 ; then \
+      mkdir -p /tmp/build && cd /tmp/build && \
+      git clone --recurse-submodules https://github.com/libbpf/bpftool.git && \
+      cd bpftool/src && make && make install PREFIX=/usr && \
+      cd / && rm -rf /tmp/build ; \
+    fi
+
+
 # Use existing libbpf from /opt/libbpf
 RUN if ! command -v bpftool >/dev/null 2>&1 ; then \
       mkdir -p /tmp/build && cd /tmp/build && \
