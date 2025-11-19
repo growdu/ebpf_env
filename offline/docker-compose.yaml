@@ -1,0 +1,11 @@
+services:
+  ebpf-dev:
+    image: ebpf-dev:latest
+    container_name: ebpf-dev
+    ports:
+      - "2222:22"
+      - "8080:8080"
+      - "8888:8888"
+    tty: true        # 等价于 -t
+    stdin_open: true # 等价于 -i
+    restart: unless-stopped
